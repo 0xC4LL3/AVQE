@@ -18,6 +18,30 @@ class SGD:
                 print(f"Iteration {i+1}: Cost = {cost:.5f} Ha")
         return params, cost
 
+    def minimize_adaptive(self, initial_params, window_size=10, ef=1e-4, et=5e-4, num_iterations=100, verbose=True):
+        params = initial_params
+        cost_window = []
+        param_window = []
+        for i in range(num_iterations):
+            params = self.step(params)
+            cost = self.cost_function(params)
+            if verbose:
+                print(f"Iteration {i+1}: Cost = {cost:.5f} Ha")
+
+            cost_window.append(cost)
+            param_window.append(params)
+            if i >= window_size:
+                energy_diff = abs(np.mean(cost_window[-window_size:]) - 
+                                 np.mean(cost_window[-window_size-1:-1]))
+                param_diff = np.linalg.norm(
+                    np.mean(param_window[-window_size:], axis=0) - 
+                    np.mean(param_window[-window_size-1:-1], axis=0)
+                )
+                
+                if energy_diff < ef or param_diff < et:
+                    break
+        return params, cost
+
     def step(self, params):
         grad = self.parameter_shift_grad(params)
         return params - self.learning_rate * grad
