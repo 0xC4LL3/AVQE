@@ -16,7 +16,7 @@ class SGD:
             cost = self.cost_function(params)
             if verbose:
                 print(f"Iteration {i+1}: Cost = {cost:.5f} Ha")
-        return params, cost
+        return params, cost, i
 
     def minimize_adaptive(self, initial_params, window_size=10, ef=1e-4, et=5e-4, num_iterations=100, verbose=True):
         params = initial_params
@@ -40,7 +40,7 @@ class SGD:
                 
                 if energy_diff < ef or param_diff < et:
                     break
-        return params, cost
+        return params, cost, i
 
     def step(self, params):
         grad = self.parameter_shift_grad_v2(params)
